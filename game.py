@@ -48,38 +48,67 @@ while(start):
     #  
     p = 'Игрок 1' if player else 'Игрок 2'
     
-    # Ввод числа и поиск его координат
+    # Ввод числа и поиск его координат(x, y)
     number = input(f'{p} выберите число \n')
     number = int(number)
     x,y = 0,0       
     
-    
-    # Преображение таблицы в более читаемый вид (str) 
     for y1,line in enumerate(dask):
-        for x1, n  in enumerate(line): 
-            if number == n:
-                x, y = x1, y1
-                print(x, y)
+            for x1, n  in enumerate(line): 
+                if number == n:
+                    x, y = x1, y1
+                    print(x, y)
+    # Функция для преображения таблицы в более читаемый вид (str)
+    def print_dask(d):
+        
+        for y1,line in enumerate(d):
+            for x1, n  in enumerate(line): 
+                n = str(n)
+                n = '0'+n if len(n)==1 else n
             
-            n = str(n)
-            n = '0'+n if len(n)==1 else n
-            
-            dask[y1][x1] = n
-            
-    # 
-    start = False
-    for line in dask:
-        print(line)
+                d[y1][x1] = n
+        for line in d:
+            print(line)    
+    
+    # Функция, которая показывает куда можно перемещать число
+    def resolution_move(_x:int,_y:int,d):
+        
+        #
+        left_stеp, left_jump = True
+        right_stеp, right_jump = True
+        up_stеp, up_jump = True
+        down_stеp, down_jump = True
+        
+        #
+        if _y == 0: 
+            left_stеp = False
+            left_jump = False
+        if _y == 1: left_jump = False
+        if _y == 7: 
+            right_stеp = False
+            right_jump = False
+        if _y == 6: right_jump = False
+        if _x == 0: 
+            up_stеp = False
+            up_jump = False
+        if _x == 1: up_jump = False
+        if _x == 7: 
+            down_stеp = False 
+            down_jump = False
+        if _x == 6: down_jump = False 
     
     # Обратное преображение таблицы в int 
-    for y1,line in enumerate(dask):
+    '''for y1,line in enumerate(dask):
         for x1, n  in enumerate(line): 
             if number == n:
                 x, y = x1, y1
                 print(x, y)
             n = int(n)            
-            dask[y1][x1] = n
+            dask[y1][x1] = n'''
     
-    for line in dask:
-        print(line)
+    print_dask(dask)
+    
+    
+    # 
+    start = False
     
