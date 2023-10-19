@@ -34,7 +34,7 @@ player = True
 start = True
 win_player1 = [1,3,5,7,9,11,13,15,17]
 win_player2 = [2,4,6,8,10,12,14,16,18]
-
+win_player = []
 #
 while(start):
     
@@ -67,14 +67,18 @@ while(start):
     
     #  
     p = 'Игрок 1' if player else 'Игрок 2'
+    win_player = win_player1 if player else win_player2
     print_dask(dask)
     # Ввод числа и поиск его координат(x, y)
     number = int(input(f'{p} выберите число \n'))
     x,y = 0,0       
+    if number in win_player:
+        moving = True
+    else:
+        moving = False
+        print("Ощибка: вы ввели число не из вашего набора")
     
-    
-    
-    while True:
+    while moving:
         
         print_dask(dask)
         
@@ -127,12 +131,8 @@ while(start):
         dask[y][x] = 0
         
         if vector == 5:
-            start = False
+            moving = False
+            player = not player
             
-    
-        
-    
-    
-    # 
-        
+
     
