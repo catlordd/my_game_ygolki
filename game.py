@@ -70,7 +70,12 @@ while(start):
     win_player = win_player1 if player else win_player2
     print_dask(dask)
     # Ввод числа и поиск его координат(x, y)
-    number = int(input(f'{p} выберите число \n'))
+    number = input(f'{p} выберите число \n')
+    if number == '':
+        moving = False
+        print("Ощибка: вы не ввели число")
+        continue
+    number = int(number)
     x,y = 0,0       
     if number in win_player:
         moving = True
@@ -105,34 +110,50 @@ while(start):
         if y == 7 or dask[y+1][x]!=0: down_stеp = False     
         if y >= 6 or dask[y+2][x]!=0: down_jump = False
         
-        vector = int(input(f'{p} выберите направление хода \n'))
+        vector = input(f'{p} выберите направление хода \n')
+        if vector not in ['8','2','4','6','5'] or vector == '':
+            print("Нет такого направления хода")
+            continue
         
+        
+        vector = int(vector)
         if vector == 8:
             if up_stеp:
                 dask[y-1][x] = number
+                dask[y][x] = 0
+                moving = False
+                player = not player
             elif up_jump:
                 dask[y-2][x] = number
+                dask[y][x] = 0
         elif vector == 2:
             if down_stеp:
                 dask[y+1][x] = number
+                dask[y][x] = 0
+                moving = False
+                player = not player
             elif down_jump:
                 dask[y+2][x] = number
+                dask[y][x] = 0
         elif vector == 4:
             if left_stеp:
                 dask[y][x-1] = number
+                dask[y][x] = 0
+                moving = False
+                player = not player
             elif left_jump:
                 dask[y][x-2] = number
+                dask[y][x] = 0
         elif vector == 6:
             if right_stеp:
                 dask[y][x+1] = number
+                dask[y][x] = 0
+                moving = False
+                player = not player
             elif right_jump:
                 dask[y][x+2] = number
-        
-        dask[y][x] = 0
+                dask[y][x] = 0
         
         if vector == 5:
             moving = False
             player = not player
-            
-
-    
