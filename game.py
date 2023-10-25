@@ -1,4 +1,4 @@
-#
+# Массив из чисел для игральной доски
 dask = [[1,3,5,0,0,0,0,0],
         [7,9,11,0,0,0,0,0],
         [13,15,17,0,0,0,0,0],
@@ -8,7 +8,7 @@ dask = [[1,3,5,0,0,0,0,0],
         [0,0,0,0,0,8,10,12],
         [0,0,0,0,0,14,16,18]]
 
-#
+# Функция для отрисовки игральной доски
 def print_dask(dd:list):
     
     d = []
@@ -30,7 +30,7 @@ def print_dask(dd:list):
 #
 player = True
 
-#
+# Массивы из чисел для игроков
 start = True
 win_player1 = [1,3,5,7,9,11,13,15,17]
 win_player2 = [2,4,6,8,10,12,14,16,18]
@@ -54,7 +54,7 @@ while(start):
             print(corner1)
         if len(corner1) == 0:
             start = False
-            print('Player_2 is WIN!!!')
+            print('Игрок 2 выйграл!!!')
             
     for num in corner2:
         if num in win_player1:
@@ -62,13 +62,14 @@ while(start):
             print(corner2)
         if len(corner2) == 0:
             start = False
-            print('Player_1 is WIN!!!')
+            print('Игрок 1 выйграл!!!')
     
     
-    #  
+    # Присваевание переменным номера игрока и соответсвующего ему списка чисел
     p = 'Игрок 1' if player else 'Игрок 2'
     win_player = win_player1 if player else win_player2
     print_dask(dask)
+    
     # Ввод числа и поиск его координат(x, y)
     number = input(f'{p} выберите число \n')
     if number == '':
@@ -76,28 +77,31 @@ while(start):
         print("Ощибка: вы не ввели число")
         continue
     number = int(number)
-    x,y = 0,0       
+    x,y = 0,0
+    
+    # Проверка: выбранное число из списка чисел для этого игрока?       
     if number in win_player:
         moving = True
     else:
         moving = False
-        print("Ощибка: вы ввели число не из вашего набора")
+        print("Ощибка: вы выбрали число не из вашего набора")
+    
+    # Переменные для шагов
+    left_stеp, right_stеp, up_stеp, down_stеp = True, True, True, True
     
     while moving:
         
         print_dask(dask)
         
+        # Цикл для поиска координат выбранного числа
         for y1,line in enumerate(dask):
                 for x1, n  in enumerate(line): 
                     if number == n:
                         x, y = x1, y1
-                        print(x, y)
+                        #print(x, y)
                         
-        # Шаг и прижок
-        left_stеp, left_jump = True, True
-        right_stеp, right_jump = True, True
-        up_stеp, up_jump = True, True
-        down_stеp, down_jump = True, True
+        # Переменные для прижов
+        left_jump, right_jump, up_jump, down_jump = True, True, True, True
         
         # Куда можно сделать ход, а куда нельзя
         if x == 0 or dask[y][x-1]!=0: left_stеp = False   
@@ -106,16 +110,46 @@ while(start):
         if x >= 6 or dask[y][x+2]!=0: right_jump = False
         
         if y == 0 or dask[y-1][x]!=0: up_stеp = False     
-        if y >= 1 or dask[y-2][x]!=0: up_jump = False
+        if y <= 1 or dask[y-2][x]!=0: up_jump = False
         if y == 7 or dask[y+1][x]!=0: down_stеp = False     
         if y >= 6 or dask[y+2][x]!=0: down_jump = False
         
+        if dask[y][x-1]==0: left_jump = False
+        if dask[y][x+1]==0: right_jump = False
+        if dask[y-1][x]==0: up_jump = False
+        if dask[y+1][x]==0: down_jump = False
+        
+        # Вызываем ошибку если некуда делать ход
+        if left_stеp == False and \
+            left_jump == False and \
+            right_stеp == False and \
+            right_jump == False and \
+            up_stеp == False and \
+            up_jump == False and \
+            down_stеp == False and \
+            down_jump == False:
+                print("Ощибка: вы выбрали число, которому некуда делать ход")
+                moving = False
+                break
+        
+        # Выбор направления хода
         vector = input(f'{p} выберите направление хода \n')
         if vector not in ['8','2','4','6','5'] or vector == '':
             print("Нет такого направления хода")
             continue
         
+        # Функция для шагов
+        def step_False():
+            global left_stеp
+            global right_stеp
+            global up_stеp
+            global down_stеp
+            left_stеp = False
+            right_stеp = False
+            up_stеp = False
+            down_stеp = False
         
+        # Алгоритм хода
         vector = int(vector)
         if vector == 8:
             if up_stеp:
@@ -126,6 +160,7 @@ while(start):
             elif up_jump:
                 dask[y-2][x] = number
                 dask[y][x] = 0
+                step_False()
         elif vector == 2:
             if down_stеp:
                 dask[y+1][x] = number
@@ -135,6 +170,7 @@ while(start):
             elif down_jump:
                 dask[y+2][x] = number
                 dask[y][x] = 0
+                step_False()
         elif vector == 4:
             if left_stеp:
                 dask[y][x-1] = number
@@ -144,6 +180,7 @@ while(start):
             elif left_jump:
                 dask[y][x-2] = number
                 dask[y][x] = 0
+                step_False()
         elif vector == 6:
             if right_stеp:
                 dask[y][x+1] = number
@@ -153,7 +190,8 @@ while(start):
             elif right_jump:
                 dask[y][x+2] = number
                 dask[y][x] = 0
-        
+                step_False()
+    
         if vector == 5:
             moving = False
             player = not player
