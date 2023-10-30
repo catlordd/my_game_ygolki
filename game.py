@@ -1,6 +1,5 @@
 from termcolor import colored, cprint
 
-
 # Правила игры
 print("Правила игры:\n\
 Два игрока. Первый игрок управляет нечетными числами, второй четными.\n\
@@ -200,7 +199,7 @@ while(start):
         if vector == 5:
             moving = False
             player = not player
-        # Списки цифр в углах
+    # Списки цифр в углах
     corner1 = [dask[0][0],dask[0][1],dask[0][2],
                dask[1][0],dask[1][1],dask[1][2],
                dask[2][0],dask[2][1],dask[2][2]]
@@ -213,7 +212,7 @@ while(start):
     win_p1 = 0
     win_p2 = 0
     
-    for num in corner2:
+    for num in corner1:
         if num in win_player2:
             win_p2 += 1
         else:
