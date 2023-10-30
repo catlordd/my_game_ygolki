@@ -1,3 +1,23 @@
+from termcolor import colored, cprint
+
+
+# Правила игры
+print("Правила игры:\n\
+Два игрока. Первый игрок управляет нечетными числами, второй четными.\n\
+Побеждает тот, кто сможет первым переместить свои числа\n\
+в противоположный угол.\n\
+Игроки ходят по очереди. За один ход можно переместить одно число.\n\
+Порядок хода:\n\
+1) Выбираете число\n\
+2) Выбираете направление хода с помощью Num-клавиатуры\n\
+(влево - 4, вправо - 6, вверх - 8, вниз - 2).\n\
+Число может шагнуть на соседнюю клетку, если там '00'\n\
+или может перепрыгнуть через любое число кроме '00'\n\
+3) Чтобы закончить ход введите '5', или ход закончится автоматически,\
+если вы переместили чисто просто на соседнюю клетку")
+input('Если готовы, нажмите "Enter"')
+
+
 # Массив из чисел для игральной доски
 dask = [[1,3,5,0,0,0,0,0],
         [7,9,11,0,0,0,0,0],
@@ -9,25 +29,34 @@ dask = [[1,3,5,0,0,0,0,0],
         [0,0,0,0,0,14,16,18]]
 
 # Функция для отрисовки игральной доски
-def print_dask(dd:list):
-    
+def print_dask(dd:list, select_num = '0'):
+    select_num = '0'+select_num if len(select_num)==1 else select_num
     d = []
-    
     for y1,line in enumerate(dd):
         d.append([])
         for x1, n  in enumerate(line): 
             d[y1].append(n)
-    
+    #  Массив для хранения цветов
+    color_list = [[],[],[],[],[],[],[],[]]
+            
     for y1,line in enumerate(d):
         for x1, n  in enumerate(line): 
             n = str(n)
             n = '0'+n if len(n)==1 else n
-            
             d[y1][x1] = n
-    for line in d:
-        print(line)
+            
+            if n == '00': color_list[y1].append('white')
+            elif n == select_num: color_list[y1].append('yellow')
+            elif n in ['01','03','05','07','09','11','13','15','17']: color_list[y1].append('red')
+            elif n in ['02','04','06','08','10','12','14','16','18']: color_list[y1].append('green')
+            
+    for line, color_line in zip(d, color_list): 
+        print(colored(line[0], color_line[0]),colored(line[1], color_line[1]),\
+            colored(line[2], color_line[2]),colored(line[3], color_line[3]),\
+            colored(line[4], color_line[4]),colored(line[5], color_line[5]),\
+            colored(line[6], color_line[6]),colored(line[7], color_line[7]))
 
-#
+# Переменная для выбора игрока
 player = True
 
 # Массивы из чисел для игроков
@@ -38,43 +67,17 @@ win_player = []
 #
 while(start):
     
-    # Списки цифр углах
-    corner1 = [dask[0][0],dask[0][1],dask[0][2],
-               dask[1][0],dask[1][1],dask[1][2],
-               dask[2][0],dask[2][1],dask[2][2]]
-    
-    corner2 = [dask[5][5],dask[5][6],dask[5][7],
-               dask[6][5],dask[6][6],dask[6][7],
-               dask[7][5],dask[7][6],dask[7][7]] 
-    
-    # Условие победы
-    for num in corner1:
-        if num in win_player2:
-            corner1.remove(num)
-            print(corner1)
-        if len(corner1) == 0:
-            start = False
-            print('Игрок 2 выйграл!!!')
-            
-    for num in corner2:
-        if num in win_player1:
-            corner2.remove(num)
-            print(corner2)
-        if len(corner2) == 0:
-            start = False
-            print('Игрок 1 выйграл!!!')
-    
-    
-    # Присваевание переменным номера игрока и соответсвующего ему списка чисел
+    # Присваивание переменным соответсвующего им номера игрока, цвета и списка чисел
     p = 'Игрок 1' if player else 'Игрок 2'
+    p_color = 'red' if player else 'green'
     win_player = win_player1 if player else win_player2
     print_dask(dask)
     
     # Ввод числа и поиск его координат(x, y)
-    number = input(f'{p} выберите число \n')
+    number = input(colored(p,p_color)+' выберите число \n')
     if number == '':
         moving = False
-        print("Ощибка: вы не ввели число")
+        print("Ошибка: вы не ввели число")
         continue
     number = int(number)
     x,y = 0,0
@@ -84,7 +87,7 @@ while(start):
         moving = True
     else:
         moving = False
-        print("Ощибка: вы выбрали число не из вашего набора")
+        print("Ошибка: вы выбрали число не из вашего набора")
     
     # Переменные для шагов
     left_stеp, right_stеp, up_stеp, down_stеp = True, True, True, True
@@ -100,24 +103,26 @@ while(start):
                         x, y = x1, y1
                         #print(x, y)
                         
-        # Переменные для прижов
+        # Переменные для прыжков
         left_jump, right_jump, up_jump, down_jump = True, True, True, True
+        try:
+            # Куда можно сделать ход, а куда нельзя
+            if x == 0 or dask[y][x-1]!=0: left_stеp = False   
+            if x <= 1 or dask[y][x-2]!=0: left_jump = False
+            if x == 7 or dask[y][x+1]!=0: right_stеp = False    
+            if x >= 6 or dask[y][x+2]!=0: right_jump = False
         
-        # Куда можно сделать ход, а куда нельзя
-        if x == 0 or dask[y][x-1]!=0: left_stеp = False   
-        if x <= 1 or dask[y][x-2]!=0: left_jump = False
-        if x == 7 or dask[y][x+1]!=0: right_stеp = False    
-        if x >= 6 or dask[y][x+2]!=0: right_jump = False
+            if y == 0 or dask[y-1][x]!=0: up_stеp = False     
+            if y <= 1 or dask[y-2][x]!=0: up_jump = False
+            if y == 7 or dask[y+1][x]!=0: down_stеp = False     
+            if y >= 6 or dask[y+2][x]!=0: down_jump = False
         
-        if y == 0 or dask[y-1][x]!=0: up_stеp = False     
-        if y <= 1 or dask[y-2][x]!=0: up_jump = False
-        if y == 7 or dask[y+1][x]!=0: down_stеp = False     
-        if y >= 6 or dask[y+2][x]!=0: down_jump = False
-        
-        if dask[y][x-1]==0: left_jump = False
-        if dask[y][x+1]==0: right_jump = False
-        if dask[y-1][x]==0: up_jump = False
-        if dask[y+1][x]==0: down_jump = False
+            if dask[y][x-1]==0: left_jump = False
+            if dask[y][x+1]==0: right_jump = False
+            if dask[y-1][x]==0: up_jump = False
+            if dask[y+1][x]==0: down_jump = False
+        except IndexError:
+            pass
         
         # Вызываем ошибку если некуда делать ход
         if left_stеp == False and \
@@ -128,12 +133,12 @@ while(start):
             up_jump == False and \
             down_stеp == False and \
             down_jump == False:
-                print("Ощибка: вы выбрали число, которому некуда делать ход")
+                print("Ошибка: вы выбрали число, которому некуда делать ход")
                 moving = False
                 break
         
         # Выбор направления хода
-        vector = input(f'{p} выберите направление хода \n')
+        vector = input(colored(p,p_color)+' выберите направление хода \n')
         if vector not in ['8','2','4','6','5'] or vector == '':
             print("Нет такого направления хода")
             continue
@@ -195,3 +200,33 @@ while(start):
         if vector == 5:
             moving = False
             player = not player
+        # Списки цифр в углах
+    corner1 = [dask[0][0],dask[0][1],dask[0][2],
+               dask[1][0],dask[1][1],dask[1][2],
+               dask[2][0],dask[2][1],dask[2][2]]
+    
+    corner2 = [dask[5][5],dask[5][6],dask[5][7],
+               dask[6][5],dask[6][6],dask[6][7],
+               dask[7][5],dask[7][6],dask[7][7]] 
+    
+    # Условие победы
+    win_p1 = 0
+    win_p2 = 0
+    
+    for num in corner2:
+        if num in win_player2:
+            win_p2 += 1
+        else:
+            break       
+    for num in corner2:
+        if num in win_player1:
+            win_p1 += 1
+        else:
+            break
+    
+    if win_p1 == 9: 
+        print(colored('Игрок 1 выйграл!!!', 'red'))
+        start = False
+    elif win_p2 == 9: 
+        print(colored('Игрок 2 выйграл!!!', 'green'))
+        start = False
